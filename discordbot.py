@@ -42,12 +42,12 @@ TIMEZONE_ROLES = {
 # --------- ROLE SETUP ----------
 async def setup_roles(guild):
     existing_roles = {role.name: role for role in guild.roles}
-    for name in TIMEZONE_ROLES.values():
-        if name not in existing_roles:
+    for _, (role_name, tz) in TIMEZONE_ROLES.items():
+        if role_name not in [r.name for r in guild.roles]:
             try:
-                await guild.create_role(name=name)
+                await guild.create_role(name=role_name)
             except discord.Forbidden:
-                print(f"Missing permissions to create role {name} in {guild.name}")
+                print(f"Missing permissions to create role {role_name} in {guild.name}")
 
 @bot.event
 async def on_guild_join(guild):
