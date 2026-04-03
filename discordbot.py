@@ -61,7 +61,11 @@ async def on_ready():
 # ---------- COMMAND ----------
 
 @bot.command()
-async def timezone(ctx, number: int):
+async def timezone(ctx, number: int = None):
+    if number is None:
+        await ctx.send("Use it like this: !timezone 1-24")
+        return
+
     if number not in TIMEZONE_ROLES:
         await ctx.send("Pick a number from 1 to 24.")
         return
@@ -73,14 +77,13 @@ async def timezone(ctx, number: int):
         await ctx.send("Timezone roles aren't set up yet.")
         return
 
-    # remove old timezone roles
     roles_to_remove = [r for r in ctx.author.roles if r.name in TIMEZONE_ROLES.values()]
     if roles_to_remove:
         await ctx.author.remove_roles(*roles_to_remove)
 
     await ctx.author.add_roles(role)
-    offset = number - 12
-    await ctx.send(f"your timezone is {role_name} (UTC{offset:+})")
+
+    await ctx.send(f"your timezone is {role_name}")
     
 # ---------- RUN ----------
 
