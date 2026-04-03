@@ -66,17 +66,26 @@ async def timezone(ctx, number: int = None):
         await ctx.send("Pick a number from 1 to 24.")
         return
 
-    role_name = TIMEZONE_ROLES[number]
+    role_name, tz_iana = TIMEZONE_ROLES[number]
+
+    # Look for the role properly
     role = discord.utils.get(ctx.guild.roles, name=role_name)
+    if role is None:
+        # If it wasn’t found, try creating it on the fly
+        try:
+            role = await ctx.guild.create_role(name=role_name)
+        except discord.Forbidden:
+            await ctx.send(f"I don’t have permission to create the role {role_name}!")
+            return
 
-    # Remove old timezone roles
-    roles_to_remove = [r for r in ctx.author.roles if r.name in TIMEZONE_ROLES.values()]
-    if roles_to_remove:
-        await ctx.author.remove_roles(*roles_to_remove)
+    # Remove any old timezone roles
+    old_roles = [r for r in ctx.author.roles if r.name in [n for n, _ in TIMEZONE_ROLES.values()]]
+    if old_roles:
+        await ctx.author.remove_roles(*old_roles)
 
+    # Add the new role
     await ctx.author.add_roles(role)
     await ctx.send(f"your timezone is {role_name}")
-
 # --------- CALCULATION ----------
 def calculate_time_from_role(user_roles):
     tz_role_tuple = next(
