@@ -13,30 +13,30 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 # --------- TIMEZONE ROLES ----------
 TIMEZONE_ROLES = {
-    1: "HST",
-    2: "AKST",
-    3: "PST",
-    4: "MST",
-    5: "CST",
-    6: "EST",
-    7: "AST",
-    8: "BRT",
-    9: "GMT",
-    10: "CET",
-    11: "EET",
-    12: "MSK",
-    13: "GST",
-    14: "IST",
-    15: "BST",
-    16: "ICT",
-    17: "CST-China",
-    18: "JST",
-    19: "AEST",
-    20: "ACST",
-    21: "AWST",
-    22: "NZST",
-    23: "UTC+13",
-    24: "UTC+14"
+    1: ("HST", "Pacific/Honolulu"),
+    2: ("AKST", "America/Anchorage"),
+    3: ("PST", "America/Los_Angeles"),
+    4: ("MST", "America/Denver"),
+    5: ("CST", "America/Chicago"),
+    6: ("EST", "America/New_York"),
+    7: ("AST", "America/Halifax"),
+    8: ("BRT", "America/Sao_Paulo"),
+    9: ("GMT", "Etc/GMT"),
+    10: ("CET", "Europe/Paris"),
+    11: ("EET", "Europe/Athens"),
+    12: ("MSK", "Europe/Moscow"),
+    13: ("GST", "Asia/Dubai"),
+    14: ("IST", "Asia/Kolkata"),
+    15: ("BST", "Asia/Dhaka"),
+    16: ("ICT", "Asia/Bangkok"),
+    17: ("CST-China", "Asia/Shanghai"),
+    18: ("JST", "Asia/Tokyo"),
+    19: ("AEST", "Australia/Sydney"),
+    20: ("ACST", "Australia/Adelaide"),
+    21: ("AWST", "Australia/Perth"),
+    22: ("NZST", "Pacific/Auckland"),
+    23: ("UTC+13", "Pacific/Enderbury"),
+    24: ("UTC+14", "Pacific/Kiritimati")
 }
 
 # --------- ROLE SETUP ----------
@@ -79,17 +79,23 @@ async def timezone(ctx, number: int = None):
 
 # --------- CALCULATION ----------
 def calculate_time_from_role(user_roles):
-    tz_role = next((r.name for r in user_roles if r.name in TIMEZONE_ROLES.values()), None)
-    if tz_role is None:
-        tz_role = "EST"  # fallback default
+    tz_role_tuple = next(
+        ((name, tz) for _, (name, tz) in TIMEZONE_ROLES.items() if name in [r.name for r in user_roles]),
+        None
+    )
+    
+    if tz_role_tuple is None:
+        tz_name, tz_iana = "EST", "America/New_York"  # fallback
+    else:
+        tz_name, tz_iana = tz_role_tuple
 
-    now = datetime.now(ZoneInfo(tz_role))
+    now = datetime.now(ZoneInfo(tz_iana))
     hour = now.hour % 12
     minute = now.minute
     minutes_after_1 = (hour - 1) * 60 + minute
     quarters = minutes_after_1 // 15
 
-    return f"It's {quarters} quarters after 1, I'm all alone and I need you now. ({tz_role})"
+    return f"It's {quarters} quarters after 1, I'm all alone and I need you now. ({tz_name})"
 
 @bot.command()
 async def glorp(ctx):
