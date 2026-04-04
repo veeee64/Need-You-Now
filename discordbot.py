@@ -3,6 +3,7 @@ from zoneinfo import ZoneInfo
 import discord
 from discord.ext import commands
 import os
+import random
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -110,6 +111,23 @@ def calculate_time_from_role(user_roles):
 async def glorp(ctx):
     msg = calculate_time_from_role(ctx.author.roles)
     await ctx.send(msg)
+@bot.command()
+async def TGIfriday(ctx):
+    folder = "images"
+
+    # get all jpg files
+    files = [f for f in os.listdir(folder) if f.endswith(".jpg")]
+
+    if not files:
+        await ctx.send("Vee fucked up and there is no TGI Fridays...")
+        return
+
+    # pick random file
+    choice = random.choice(files)
+    path = os.path.join(folder, choice)
+    
+    #send it
+    await ctx.send(file=discord.File(path))
 
 # --------- RUN ----------
 token = os.getenv("TOKEN")
