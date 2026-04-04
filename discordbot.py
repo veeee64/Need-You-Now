@@ -113,7 +113,7 @@ async def glorp(ctx):
     await ctx.send(msg)
 @bot.command()
 async def TGIfriday(ctx):
-    folder = "images"
+    folder = "TGI"
 
     # get all jpg files
     files = [f for f in os.listdir(folder) if f.endswith(".jpg")]
